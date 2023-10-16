@@ -2,28 +2,22 @@ package application;
 
 import java.io.*;
 import java.net.*;
-import java.net.http.HttpClient;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ConnectURL {
     private final String url_adres = "http://127.0.0.1:8080/HelloWorld/hello";
-    public void connectURL(List text) throws IOException, InterruptedException, SQLException, ClassNotFoundException {
+    public void connectURL(List text) throws IOException {
         URL url = new URL(url_adres);
         postRequest(text, url);
     }
 
     private void postRequest(List text, URL url) throws IOException {
-        String raw_data = "name=" + text.get(0) + "&date=";
+        String raw_data = "name=" + text.get(0) + "&date=" + text.get(1) + "&proc=" + text.get(2) + "&ext_fr=" + text.get(3)
+                + "&max_fr=" + text.get(4) + "&cur_fr=" + text.get(5) + "&L1=" + text.get(7) + "&L2=" + text.get(8)
+                + "&L3=" + text.get(9);
 
         String type = "application/x-www-form-urlencoded";
-
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
@@ -33,37 +27,36 @@ public class ConnectURL {
         OutputStream outputStream = connection.getOutputStream();
         outputStream.write(raw_data.getBytes());
 
-        outputStream.flush();
-        outputStream.close();
+        File file = new File("C:\\Users\\Public\\Everest\\RESPONSES\\report.txt");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
 
-        FileWriter fileWriter = new FileWriter("report.txt");
         int responseCode = connection.getResponseCode();
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
             System.out.println("Я зашел");
-            System.out.println(text);
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
 
-            String inputLine;
-            StringBuffer response = new StringBuffer();
+            for (Object o : text) fileOutputStream.write(o.toString().getBytes());
 
-            while ((inputLine = in.readLine()) != null) response.append(inputLine);
-
-            in.close();
-
-            fileWriter.write("sdsds");
+            Runtime.getRuntime().exec("notepad C:\\Users\\Public\\Everest\\RESPONSES\\report.txt");
         }
 
         else {
             System.out.println("Я не зашел");
+        }
 
-            fileWriter.write("Соединение с сервером не было установлено");
+        fileOutputStream.close();
+        outputStream.close();
+
+//            BufferedReader in = new BufferedReader(new InputStreamReader(
+//                    connection.getInputStream()));
+
+//            String inputLine;
+//            StringBuffer response = new StringBuffer();
+//
+//            while ((inputLine = in.readLine()) != null) {
+//                System.out.println(inputLine);
+//                response.append(inputLine);
+//            }
+//            in.close();
         }
     }
-}
-// процессоры
-// Вн частота, макс, текущая
-// Кэш L1 кода, кэш L2...
-
-// Устройства памяти / (количество)

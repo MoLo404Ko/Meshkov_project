@@ -15,8 +15,8 @@ public class Main extends HttpServlet {
     public void init() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://sql6.freesqldatabase.com:3306/sql6637822",
-                    "sql6637822", "XgbwmMMdk7");
+            connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12653699",
+                    "sql12653699", "Maze7MNHhE");
             statement = connection.createStatement();
         }
         catch (SQLException e) { throw new RuntimeException(e); }
@@ -24,24 +24,34 @@ public class Main extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         doPost(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String sql = "INSERT INTO test VALUES (\'" + req.getParameter("data") + "\')";
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String insert_summary_info = "INSERT INTO summary_info VALUES (\'" + req.getParameter("name") + "\'," + "\'" +
+                req.getParameter("date") + "\')";
+
+        String insert_processor = "INSERT INTO processor VALUES (" +
+                "\'" + req.getParameter("name") + "\'," +
+                "\'" + req.getParameter("proc") + "\'," +
+                "\'" + req.getParameter("ext_fr") + "\'," +
+                "\'" + req.getParameter("max_fr") + "\'," +
+                "\'" + req.getParameter("cur_fr") + "\'," +
+                "\'" + req.getParameter("L1") + "\'," +
+                "\'" + req.getParameter("L2") + "\'," +
+                "\'" + req.getParameter("L3") + "\')";
         try {
-            statement.executeUpdate(sql);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+            statement.executeUpdate(insert_processor);
+            statement.executeUpdate(insert_summary_info);
+        } catch (SQLException e) { throw new RuntimeException(e); }
 
         PrintWriter writer = resp.getWriter();
         resp.setContentType("text/html");
         resp.setCharacterEncoding("UTF-8");
-        writer.print(req.getParameter("data"));
-        writer.println(req.getHeaderNames().toString());
+        writer.print(req.getParameter("name"));
+        writer.print(req.getParameter("date"));
     }
 
     @Override

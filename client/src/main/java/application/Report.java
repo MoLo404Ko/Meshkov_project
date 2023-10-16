@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Report {
 
-    public Report() throws SQLException, ClassNotFoundException {}
+    public Report() {}
 
     // ------------------------------------------------ CREATE REPORT --------------------------------------------------
     /**
@@ -24,9 +24,9 @@ public class Report {
      */
     public static void create_report() throws IOException, SQLException, ClassNotFoundException, InterruptedException {
         // ----- 1
-//        String command = "cmd /c " + Constants.EVEREST_PATH + " EVEREST /R /HW /ANGEN /TEXT";
-//        Runtime runtime = Runtime.getRuntime();
-//        runtime.exec(command).waitFor();
+        String command = "cmd /c " + Constants.EVEREST_PATH + " EVEREST /R /HW /ANGEN /TEXT";
+        Runtime runtime = Runtime.getRuntime();
+        runtime.exec(command).waitFor();
 
         // ----- 2
         String computerName = getComputerName();
@@ -36,16 +36,21 @@ public class Report {
         // ----- 4
         List<String> result_text = new ArrayList<>();
 
+        BufferedReader bfr = new BufferedReader(new StringReader(text));
         try {
             String line;
-            BufferedReader bfr = new BufferedReader(new StringReader(text));
             line = bfr.readLine();
 
             while (line != null) {
                 result_text.add(line);
                 line = bfr.readLine();
             }
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        finally {
+            bfr.close();
+        }
 
         // ------ 5
         ConnectURL connectURL = new ConnectURL();
@@ -78,16 +83,15 @@ public class Report {
      * KeyWords:
      * Summary_info table #1
      * Processor table #2
-     * @param computerName
+     * @param computerName - host computer name
      * @return data to db
      * @throws IOException
      */
     private static String prepareInfoToDB(String computerName) throws IOException {
-        long start_time = System.currentTimeMillis();
         ArrayList<String> key_words = new ArrayList<>();
 
         ArrayList<String> information = new ArrayList();
-        information.add(computerName);
+        information.add(computerName + "&");
 
         // KeyWords summary_info table
         key_words.add("Дата"); // #1
@@ -103,8 +107,7 @@ public class Report {
 
         File file = new File(Constants.REPORT_PATH + computerName + ".txt");
         String line;
-        String text = computerName + "&";
-        int kernels = 0;
+        String text = "";
 
         if (file.exists()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader
@@ -131,35 +134,35 @@ public class Report {
                 }
             }
 
-            for (String s: information) System.out.println(s);
-//
+            for (String s: information) {
+                text = text + s;
+            }
+
 //            // Summary_info
-            text = text.replace("Дата",  "");
-            text = text.replace("Процессоры / ", "");
+//            text = text.replace("Дата",  "");
+//            text = text.replace("Процессоры / ", "");
             text = text.replace("Имя устройства", "");
             text = text.replace("Описание устройства", "");
-
-            // Processor
-            text = text.replaceAll("Внешняя частота", "");
-            text = text.replaceAll("Максимальная частота", "");
-            text = text.replaceAll("Текущая частота", "");
-            text = text.replaceAll("Кэш L1 кода", "");
-            text = text.replaceAll("Кэш L2", "");
-            text = text.replaceAll("Кэш L3", "");
-
-            text = text.replaceAll("\\s+", " ");
+//
+//            // Processor
+//            text = text.replaceAll("Внешняя частота", "");
+//            text = text.replaceAll("Максимальная частота", "");
+//            text = text.replaceAll("Текущая частота", "");
+//            text = text.replaceAll("Кэш L1 кода", "");
+//            text = text.replaceAll("Кэш L2", "");
+//            text = text.replaceAll("Кэш L3", "");
+//
+            text = text.replaceAll("\\s+", "");
             text = text.replaceAll("\\[", "");
             text = text.replaceAll("\\]", "");
             text = text.replaceAll("&", "\n");
             text = text.replaceAll("/", " ");
-            text = text.replaceAll("МГц", "");
-            text = text.replaceAll("Мб", "");
-            text = text.replaceAll("Кб", "");
+//            text = text.replaceAll("МГц", "");
+//            text = text.replaceAll("Мб", "");
+//            text = text.replaceAll("Кб", "");
 
-//            System.out.println(text);
+            System.out.println(text);
             reader.close();
-
-            System.out.println(System.currentTimeMillis() - start_time);
         }
         else Runtime.getRuntime().exec("notepad C:\\Users\\Public\\Project\\Errors\\FileNotFound");
 
